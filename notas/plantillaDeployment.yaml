@@ -1,0 +1,70 @@
+---
+kind:           Deployment
+apiVersion:     apps/v1 # En que libreria esta el objeto de tipo Deployment
+
+metadata:
+    name:       wordpress
+
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: wordpress
+    
+    template:
+        metadata:
+            labels:
+                app: wordpress
+        spec:
+            containers:
+                - name:
+                  image: 
+                  ports:
+                  volumeMounts:
+                    - name: datos-wordpress
+                      path: /datos
+            volumes:
+                - name: datos-wordpress
+                  # De donde saco el volumen
+                  presistentVolumeClaim:
+                    claimName: mi-peticion-de-volumen-para-wordpress
+                    
+---
+kind:           PersistentVolumeClaim
+apiVersion:     v1 # En que libreria esta el objeto de tipo Deployment
+
+metadata:
+    name:       mi-peticion-de-volumen-para-wordpress-2
+
+spec:
+    storageClassName:  cluster-nfs    # Provisionador si es un volumen que se va a generar dinamicamente
+                                    # Un tipo de volumen precreado que tengo yo en el cluster como administrador
+    resources:
+        requests:
+            storage: 10Gi
+            
+    accessModes:
+        - ReadWriteOnce
+
+#---
+#kind:           PersistentVolume
+#apiVersion:     v1 # En que libreria esta el objeto de tipo Deployment
+
+#metadata:
+#    name:       mi-volumen-de-wordpress
+
+#spec:
+#    hostPath:
+#        path: /data/worpress
+#        type: DirectoryOrCreate
+
+#    accessModes:
+#        - ReadWriteOnce
+#        - ReadWriteMany
+        
+#    storageClassName:  rapidito
+          
+#    capacity:
+#        storage: 30Gi
+                  
+#---

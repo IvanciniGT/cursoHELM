@@ -45,3 +45,57 @@ OPCIONALMENTE:
         - Asociación entre el serviceAccount y los roles
 
 HELM Es un gestor de paquetes para Kubernetes
+
+----------------------
+
+Que pasa con los pvc que se crean.... y la diferencia de si el pvc ha sido creado para un statefulset o un deployment
+
+Deployment vs StatefulSet
+    Deployment tenia nombre random de pods
+    Mientra que el statefulset genera numbre secuenciales
+Y eso que implica?
+Esto tiene una implicación ENORME a la hora de gestionar los VOLUMENES.
+----------------------
+Wordpress - CRM
+    Base de datos
+    Servidor WEB: php - Apache, nginx
+    
+Quiero montar mi web con Wordpress:
+    - Crear unos usuarios que administren el sitio      >>>>    BBDD
+    - Crear unas páginas web                            >>>>    BBDD
+    - Voy a tener que subir unas imágenes               >>>>    Carpeta gestionada por el servidor WEB
+    
+Cuantos tipos de contenedores voy a tener?
+    - NGINX - Apache .... Wordpress
+    - BBDD           .... MariaDB
+
+Cuantos tipos de PODs voy a tener?
+    - Deployment        - Apache - Wordpress
+    - Statefulset       - MariaDB
+
+Os habeis ido a montar Deployments... Statefulsets.... Por que no monto un pod? directamente? Podría? tiene sentido?
+    Monto un POD para MARIADB
+    Monto otro POD para Apache-Wordpress
+
+Escalabilidad - replicas 
+    
+Quiero un único POD con MariaDB y Apache dentro, juntitos. NO, desde el momento en que APACHE y MARIADB no tienen porqué escalar de la misma forma.
+
+Voy a escalar y en un momento dado quiero:
+- Quiero 2 mariasDB 
+- Quiero 3 wordpress
+
+A que datos tienen que acceder cada uno de los pods
+Todos los wordpress deben acceder a la misma información? a los mismos archivos?
+    SI >>> Todos los PODS deben trabajar contra el mismo VOLUMEN                   <<<<<< DEPLOYMENT
+Todos los mariadb deben acceder a la misma información? a los mismos archivos?
+    NO 
+    
+Cómo escala MARIADB? Si monto un escalado con MariaDB, cada base de datos que genero en un cluster (POD) tiene solo una parte de los datos.
+Por lo tanto, cada BBDD necesita disponer de su propio VOLUMEN                     <<<<<< STATEFULSET
+
+MariaDB
+ElasticSearch
+Kafka
+
+

@@ -4,10 +4,16 @@ export NOMBRE_DESPLIEGUE=mimariadb
 export NOMBRE_REPO=bitnami
 export URL_REPO=https://charts.bitnami.com/bitnami
 export NOMBRE_CHART=mariadb
+export NAMESPACE=mariadb
 
 function install(){
     helm repo add $NOMBRE_REPO $URL_REPO
-    helm install $NOMBRE_DESPLIEGUE $NOMBRE_REPO/$NOMBRE_CHART
+    helm install $NOMBRE_DESPLIEGUE \ 
+         $NOMBRE_REPO/$NOMBRE_CHART \
+         --namespace $NAMESPACE \
+         --create-namespace \
+         --set "primary.persistence.storageClass=cluster-nfs"
+        
 }
 
 function uninstall(){

@@ -1,0 +1,66 @@
+---
+kind:           StatefulSet
+apiVersion:     apps/v1 # En que libreria esta el objeto de tipo Deployment
+
+metadata:
+    name:       mariadb
+
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: mariadb
+    
+    template:
+        metadata:
+            labels:
+                app: mariadb
+        spec:
+            containers:
+                - name:
+                  image: 
+                  ports:
+                  volumeMounts:
+                    - name: datos-mariadb
+                      path: /datos
+    volumeClaimTemplates:
+        - metadata:
+            name: datos-mariadb
+          spec:
+            storageClassName:  cluster-nfs    # Provisionador si es un volumen que se va a generar dinamicamente
+                                            # Un tipo de volumen precreado que tengo yo en el cluster como administrador
+            resources:
+                requests:
+                    storage: 10Gi
+                    
+            accessModes:
+                - ReadWriteOnce                    
+
+
+#mariadb-0     --->    pvc-mariadb-0    > Tendra vinculado un determinado VOLUMEN PV
+#PUFFF mariadb-1     --->    pvc-mariadb-1    > Tendra vinculado un determinado VOLUMEN PV
+
+#mariadb-1    ----->     pvc-mariadb-1     > Tendra vinculado un determinado VOLUMEN PV
+
+#---
+#kind:           PersistentVolume
+#apiVersion:     v1 # En que libreria esta el objeto de tipo Deployment
+
+#metadata:
+#    name:       mi-volumen-de-wordpress
+
+#spec:
+#    hostPath:
+#        path: /data/worpress
+#        type: DirectoryOrCreate
+
+#    accessModes:
+#        - ReadWriteOnce
+#        - ReadWriteMany
+        
+#    storageClassName:  rapidito
+          
+#    capacity:
+#        storage: 30Gi
+                  
+#---
