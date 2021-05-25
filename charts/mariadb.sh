@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export NOMBRE_DESPLIEGUE=miMariaDB
+export NOMBRE_DESPLIEGUE=mimariadb
 export NOMBRE_REPO=bitnami
 export URL_REPO=https://charts.bitnami.com/bitnami
 export NOMBRE_CHART=mariadb
