@@ -1,0 +1,24 @@
+---
+
+kind:           Namespace
+apiVersion:     v1 # En que libreria esta el objeto de tipo Deployment
+
+metadata:
+    name:       wordpress
+
+---
+kind:           PersistentVolumeClaim
+apiVersion:     v1 # En que libreria esta el objeto de tipo Deployment
+
+metadata:
+    name:       pvc-wordpress
+
+spec:
+    storageClassName:  cluster-nfs    # Provisionador si es un volumen que se va a generar dinamicamente
+                                    # Un tipo de volumen precreado que tengo yo en el cluster como administrador
+    resources:
+        requests:
+            storage: 10Gi
+            
+    accessModes:
+        - ReadWriteOnce    
