@@ -49,8 +49,8 @@ spec:
         name: kibana
         ports:
         - containerPort: 5601
-      env:
-        - name: ELASTICSEARCH_HOSTS:
+        env:
+        - name: ELASTICSEARCH_HOSTS
           value: "http://elasticsearch-datos-srv:9200"
         - name:  SERVER_NAME
           valueFrom:
@@ -92,7 +92,7 @@ spec:
         ports:
         - containerPort: 9200
         - containerPort: 9300
-      env:
+        env:
         - name: node.name
           valueFrom:
             fieldRef:
@@ -108,7 +108,7 @@ spec:
           value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
 
         - name:  ES_JAVA_OPTS
-          value: "-Xms220m -Xmx220m""
+          value: "-Xms220m -Xmx220m"
           
         - name:  node.master
           value: "true"
@@ -121,7 +121,7 @@ spec:
         - name:  node.remote_cluster_client
           value: "false"
       
-      volumeMounts:      
+        volumeMounts:      
         - name: datos-maestros
           mountPath: /usr/share/elasticsearch/data
   
