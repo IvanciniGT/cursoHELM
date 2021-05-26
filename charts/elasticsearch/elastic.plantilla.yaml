@@ -60,6 +60,30 @@ spec:
           value: "kibana-srv"
 ---
 #######################################################
+#   SERVICIO DE MAESTROS
+#######################################################
+apiVersion: v1
+kind: Service
+
+metadata:
+  labels:
+    app: elastic-maestro
+  name: elastic-maestro
+
+spec:
+    type: ClusterIP
+    ports:
+        - name: externo
+          port: 9200
+          targetPort: 9200
+        - name: interno
+          port: 9300
+          targetPort: 9300
+    selector:
+        app: elastic-maestro
+
+---
+#######################################################
 #   STATEFULSET DE MAESTROS
 #######################################################
 
