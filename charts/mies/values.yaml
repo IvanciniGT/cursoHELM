@@ -39,8 +39,36 @@ kibana:
   # ingress:
 
 elasticsearch:
-  
 
+  clusterName: mi-cluster
+
+  nodeProperties:
+    ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    pullPolicy: IfNotPresent
+    tag: 7.7.0
+  
+  master:
+  
+    replicaCount: 3
+  
+    service: 
+      nameOverride: ""
+      fullnameOverride: ""
+      ports:
+        internal:
+          port: 9300
+          targetPort: 9300
+        external:
+          port: 9200
+          targetPort: 9200
+    
+    nodeProperties:
+      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+    
+    
 
 # Default values for mies.
 # This is a YAML-formatted file.
