@@ -1,0 +1,51 @@
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  labels:
+    app: kibana
+  name: kibana
+
+spec:
+  replicas:    # kibana.replicaCount
+  selector:
+    matchLabels:
+      app: kibana
+      
+  template:
+    metadata:
+      labels:
+        app: kibana
+        
+    spec:
+      containers:
+      - image: # kibana.image.repository : kibana.image.tag
+        imagePullPolicy: # kibana.image.pullPolicy
+        name: kibana
+        ports:
+        - containerPort: # kibana.port
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elastic-coordinador:9200"
+        - name:  SERVER_NAME
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+        - name:  SERVER_HOST
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  ELASTICSEARCH_USERNAME
+          valueFrom:
+            secretKeyRef:
+                name: elastic-secret
+                key:  user
+                
+        - name:  ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: elastic-secret
+                key:  password
+                
