@@ -46,8 +46,8 @@ elasticsearch:
     replicaCount: 3
   
     service: 
-      nameOverride: ""
-      fullnameOverride: ""
+      nameOverride: ~
+      fullnameOverride: ~
       
     nodeProperties:
       ES_JAVA_OPTS: "-Xms220m -Xmx220m"

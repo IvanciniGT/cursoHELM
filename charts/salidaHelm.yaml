@@ -4,11 +4,11 @@ kind: Secret
 apiVersion: v1
 
 metadata:
-    name: secreto-elastic
+    name:  RELEASE-NAME-secret
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "ZXhBS1ozR3d2UWx1WGox"
+    password: "UnhjWnJDSjd1R1VYR05X"
 ---
 # Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
@@ -16,8 +16,8 @@ kind: Service
 
 metadata:
   labels:
-    app: elastic-maestro
-  name: elastic-maestro
+    app:  RELEASE-NAME-elasticsearch-maestro
+  name: RELEASE-NAME-elasticsearch-maestro-srv
 
 spec:
     type: ClusterIP
@@ -30,7 +30,7 @@ spec:
           targetPort: 9300
     selector:
         app: 
-            elastic-maestro
+             RELEASE-NAME-elasticsearch-maestro
 ---
 # Source: mies/templates/kibana/service.yaml
 apiVersion: v1
@@ -38,7 +38,7 @@ kind: Service
 
 metadata:
   labels:
-    app: kibana
+    app: RELEASE-NAME-kibana
   name: RELEASE-NAME-kibana-srv
 
 spec:
@@ -47,7 +47,7 @@ spec:
         - port: 5601
           targetPort: 5601
     selector:
-        app: kibana
+        app:  RELEASE-NAME-kibana
 
 
 # NOMBRE DEL SERVICIO:
@@ -58,19 +58,19 @@ kind: Deployment
 
 metadata:
   labels:
-    app: kibana
-  name: kibana
+    app:  RELEASE-NAME-kibana
+  name:  RELEASE-NAME-kibana
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kibana
+      app:  RELEASE-NAME-kibana
       
   template:
     metadata:
       labels:
-        app: kibana
+        app:  RELEASE-NAME-kibana
         
     spec:
       containers:
@@ -109,22 +109,22 @@ kind: StatefulSet
 
 metadata:
   labels:
-    app: elastic-maestro
-  name: elastic-maestro
+    app: RELEASE-NAME-elasticsearch-maestro
+  name: RELEASE-NAME-elasticsearch-maestro
 
 spec:
   replicas: 3
   
-  serviceName: elastic-maestro
+  serviceName: RELEASE-NAME-elasticsearch-maestro-srv
   
   selector:
     matchLabels:
-      app: elastic-maestro
+      app:  RELEASE-NAME-elasticsearch-maestro
       
   template:
     metadata:
       labels:
-        app: elastic-maestro
+        app:  RELEASE-NAME-elasticsearch-maestro
         
     spec:
       containers:
@@ -144,7 +144,7 @@ spec:
           value: mi-cluster
           
         - name:  discovery.seed_hosts
-          value: elastic-maestro-0.elastic-maestro,elastic-maestro-1.elastic-maestro,elastic-maestro-2.elastic-maestro
+          value: elastic-maestro-0.RELEASE-NAME-elasticsearch-maestro-srv,elastic-maestro-1.RELEASE-NAME-elasticsearch-maestro-srv,elastic-maestro-2.RELEASE-NAME-elasticsearch-maestro-srv
           
         - name:  cluster.initial_master_nodes
           value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2

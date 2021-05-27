@@ -4,22 +4,22 @@ kind: StatefulSet
 
 metadata:
   labels:
-    app: elastic-maestro
-  name: elastic-maestro
+    app: {{ include "mies.elasticsearchmaestrolabel" . }}
+  name: {{ include "mies.elasticsearchmaestrostatefulset" . }}
 
 spec:
   replicas: {{ required "Debe introducir un número de replicas válido para los maestros de ElasticSearch: elasticsearch.master.replicaCount" .Values.elasticsearch.master.replicaCount }}
   
-  serviceName: elastic-maestro
+  serviceName: {{ include "mies.elasticsearchmaestroservicename" . }}
   
   selector:
     matchLabels:
-      app: elastic-maestro
+      app:  {{ include "mies.elasticsearchmaestrolabel" . }}
       
   template:
     metadata:
       labels:
-        app: elastic-maestro
+        app:  {{ include "mies.elasticsearchmaestrolabel" . }}
         
     spec:
       containers:
@@ -39,7 +39,7 @@ spec:
           value: {{ .Values.elasticsearch.clusterName }}
           
         - name:  discovery.seed_hosts
-          value: elastic-maestro-0.elastic-maestro,elastic-maestro-1.elastic-maestro,elastic-maestro-2.elastic-maestro
+          value: elastic-maestro-0.{{ include "mies.elasticsearchmaestroservicename" . }},elastic-maestro-1.{{ include "mies.elasticsearchmaestroservicename" . }},elastic-maestro-2.{{ include "mies.elasticsearchmaestroservicename" . }}
           
         - name:  cluster.initial_master_nodes
           value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2

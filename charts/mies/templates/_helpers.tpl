@@ -1,3 +1,48 @@
+{{- define "mies.kibanaservicename" -}}
+{{- if not (empty .Values.kibana.service.fullnameOverride) -}}
+{{- .Values.kibana.service.fullnameOverride -}}
+{{- else if not (empty .Values.kibana.service.nameOverride) -}}
+{{- .Release.Name }}-{{ .Values.kibana.service.nameOverride -}}
+{{- else -}}
+{{- .Release.Name }}-kibana-srv
+{{- end -}}
+{{- end -}}
+
+
+{{- define "mies.elasticsearchmaestroservicename" -}}
+{{- if not (empty .Values.elasticsearch.master.service.fullnameOverride) -}}
+{{- .Values.elasticsearch.master.service.fullnameOverride -}}
+{{- else if not (empty .Values.elasticsearch.master.service.nameOverride) -}}
+{{- .Release.Name }}-{{ .Values.elasticsearch.master.service.nameOverride -}}
+{{- else -}}
+{{- .Release.Name }}-elasticsearch-maestro-srv
+{{- end -}}
+{{- end -}}
+
+{{- define "mies.kibanadeployment" -}}
+{{- .Release.Name }}-kibana
+{{- end -}}
+
+{{- define "mies.elasticsearchmaestrostatefulset" -}}
+{{- .Release.Name }}-elasticsearch-maestro
+{{- end -}}
+
+{{- define "mies.secret" -}}
+{{- .Release.Name }}-secret
+{{- end -}}
+
+{{- define "mies.kibanalabel" -}}
+{{- .Release.Name }}-kibana
+{{- end -}}
+
+{{- define "mies.elasticsearchmaestrolabel" -}}
+{{- .Release.Name }}-elasticsearch-maestro
+{{- end -}}
+
+
+
+
+
 {{/*
 Expand the name of the chart.
 */}}

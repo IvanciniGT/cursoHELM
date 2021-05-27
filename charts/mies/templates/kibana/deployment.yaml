@@ -4,19 +4,19 @@ kind: Deployment
 
 metadata:
   labels:
-    app: kibana
-  name: kibana
+    app:  {{ include "mies.kibanalabel" . }}
+  name:  {{ include "mies.kibanadeployment" . }}
 
 spec:
   replicas: {{ required "Debe introducir un número de replicas válido para Kibana: kibana.replicaCount" .Values.kibana.replicaCount }}
   selector:
     matchLabels:
-      app: kibana
+      app:  {{ include "mies.kibanalabel" . }}
       
   template:
     metadata:
       labels:
-        app: kibana
+        app:  {{ include "mies.kibanalabel" . }}
         
     spec:
       containers:
