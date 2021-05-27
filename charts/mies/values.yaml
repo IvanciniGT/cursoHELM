@@ -1,32 +1,19 @@
 auth:
-  # Permite determinar si los datos de conexión con elastic serán 
-  # generador por el propio charo o se tomarán de un secret que se 
-  # haya creado externamente.
-  useExistentSecret: false
-  # Si esta propiedad está en true:
-  #    Necesito adicionalmente:
-  #       El nombre del secret
-  #       El key del nombre del usuario
-  #       El key del password del usuario
-          # existentSecret:
-          #    secretName: el-secret-del-elatic
-          #    userNameKey: Usuario
-          #    passwordKey: Contraseña
-  # Si esta propiedad está en false:
-  #     El secret será creado por el Chart. Necesitamos:
-  #       El valor del usuario
-  #       El valor del password
-  user: elastic
-  password: password
+  existentSecretName: ~
+  userNameKey: user
+  passwordKey: password
+  userNameValue: elastic       # Se ignora si se indica un existentSecretName
+  passwordValue: ~      # Se ignora si se indica un existentSecretName
+                               # Si no se establece un password y hay que generar secret, se genera un password aleatorio.
 
 kibana:
   
   replicaCount: 1
-  
+
   image:
     repository: docker.elastic.co/kibana/kibana
     pullPolicy: IfNotPresent
-    tag: 7.7.0
+    tag: 7.8.0
 
   service: 
     nameOverride: ""
@@ -51,10 +38,8 @@ elasticsearch:
     tag: 7.7.0
   
   ports:
-    internal:
-      port: 9300
-    external:
-      port: 9200
+    internal: 9300
+    external: 9200
 
   master:
   

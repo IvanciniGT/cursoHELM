@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  labels:
+    app: elastic-maestro
+  name: elastic-maestro
+
+spec:
+    type: ClusterIP
+    ports:
+        - name: externo
+          port: {{ required "Debe introducir un valor para el puerto externo de comunicaciones de ElastiSearch: elasticsearch.ports.external !!!" .Values.elasticsearch.ports.external }}
+          targetPort: {{ .Values.elasticsearch.ports.external }}
+        - name: interno
+          port: {{ required "Debe introducir un valor para el puerto interno de comunicaciones de ElastiSearch: elasticsearch.ports.internal !!!" .Values.elasticsearch.ports.internal }}
+          targetPort: {{ .Values.elasticsearch.ports.internal }}
+    selector:
+        app: 
+            elastic-master
+ 

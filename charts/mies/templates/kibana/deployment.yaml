@@ -8,7 +8,7 @@ metadata:
   name: kibana
 
 spec:
-  replicas:    # kibana.replicaCount
+  replicas: {{ required "Debe introducir un número de replicas válido para Kibana: kibana.replicaCount" .Values.kibana.replicaCount }}
   selector:
     matchLabels:
       app: kibana
@@ -20,11 +20,11 @@ spec:
         
     spec:
       containers:
-      - image: # kibana.image.repository : kibana.image.tag
-        imagePullPolicy: # kibana.image.pullPolicy
+      - image: {{ .Values.kibana.image.repository }}:{{ .Values.kibana.image.tag }}
+        imagePullPolicy: {{ .Values.kibana.image.pullPolicy }}
         name: kibana
         ports:
-        - containerPort: # kibana.port
+        - containerPort: {{ .Values.kibana.service.targetPort }}
         env:
         - name: ELASTICSEARCH_HOSTS
           value: "http://elastic-coordinador:9200"
@@ -40,12 +40,12 @@ spec:
         - name:  ELASTICSEARCH_USERNAME
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
-                key:  user
+                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                key:  {{ required "Debe introducir un valor para el nombre de la clave del USUARIO en el SECRET: auth.userNameKey !!!" .Values.auth.userNameKey }}
                 
         - name:  ELASTICSEARCH_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
-                key:  password
+                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" .Values.auth.passwordKey }}
                 

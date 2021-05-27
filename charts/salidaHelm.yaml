@@ -1,5 +1,16 @@
 ---
-# Source: mies/templates/elasticsearch/service.yaml
+# Source: mies/templates/secrets.yaml
+kind: Secret
+apiVersion: v1
+
+metadata:
+    name: secreto-elastic
+
+data:
+    user: "ZWxhc3RpYw=="
+    password: "RkNla0lrclg0TnNZSFBk"
+---
+# Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
 kind: Service
 
@@ -7,8 +18,6 @@ metadata:
   labels:
     app: elastic-maestro
   name: elastic-maestro
-
-        
 
 spec:
     type: ClusterIP
@@ -21,8 +30,7 @@ spec:
           targetPort: 9300
     selector:
         app: 
-            #elastic-data     SI Replicas de ingesta == 0
-            elastic-ingesta #  SI NO ES ASI
+            elastic-master
 ---
 # Source: mies/templates/kibana/service.yaml
 apiVersion: v1
@@ -34,11 +42,10 @@ metadata:
   name: kibana-srv
 
 spec:
-    type: NodePort
+    type: ClusterIP
     ports:
         - port: 5601
           targetPort: 5601
-          nodePort: 30004
     selector:
         app: kibana
 ---
@@ -52,7 +59,7 @@ metadata:
   name: kibana
 
 spec:
-  replicas:    # kibana.replicaCount
+  replicas: 1
   selector:
     matchLabels:
       app: kibana
@@ -64,11 +71,11 @@ spec:
         
     spec:
       containers:
-      - image: # kibana.image.repository : kibana.image.tag
-        imagePullPolicy: # kibana.image.pullPolicy
+      - image: docker.elastic.co/kibana/kibana:7.8.0
+        imagePullPolicy: IfNotPresent
         name: kibana
         ports:
-        - containerPort: # kibana.port
+        - containerPort: 5601
         env:
         - name: ELASTICSEARCH_HOSTS
           value: "http://elastic-coordinador:9200"
@@ -84,16 +91,16 @@ spec:
         - name:  ELASTICSEARCH_USERNAME
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
+                name: secreto-elastic 
                 key:  user
                 
         - name:  ELASTICSEARCH_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
+                name: secreto-elastic 
                 key:  password
 ---
-# Source: mies/templates/elasticsearch/statefulset.yaml
+# Source: mies/templates/elasticsearch/master/statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 
@@ -118,11 +125,12 @@ spec:
         
     spec:
       containers:
-      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+      - image: docker.elastic.co/kibana/kibana:7.7.0
+        imagePullPolicy: IfNotPresent
         name: elasticsearch
         ports:
-        - containerPort: 9200
         - containerPort: 9300
+        - containerPort: 9200
         env:
         - name: node.name
           valueFrom:
@@ -157,10 +165,8 @@ spec:
         - name:  ELASTIC_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
-                key:  password
-
-      
+                name: secreto-elastic 
+                key:  password                
         volumeMounts:      
         - name: datos-maestros
           mountPath: /usr/share/elasticsearch/data
@@ -173,5 +179,5 @@ spec:
           - "ReadWriteOnce"
         resources:
           requests:
-            storage: "1Gi"
-        storageClassName: cluster-nfs
+            storage: 1Gi
+        storageClassName:

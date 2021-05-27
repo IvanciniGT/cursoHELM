@@ -8,7 +8,7 @@ metadata:
   name: elastic-maestro
 
 spec:
-  replicas: 3
+  replicas: {{ required "Debe introducir un número de replicas válido para los maestros de ElasticSearch: elasticsearch.master.replicaCount" .Values.elasticsearch.master.replicaCount }}
   
   serviceName: elastic-maestro
   
@@ -23,11 +23,12 @@ spec:
         
     spec:
       containers:
-      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+      - image: {{ .Values.elasticsearch.image.repository }}:{{ .Values.elasticsearch.image.tag }}
+        imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy }}
         name: elasticsearch
         ports:
-        - containerPort: 9200
-        - containerPort: 9300
+        - containerPort: {{ .Values.elasticsearch.ports.internal }}
+        - containerPort: {{ .Values.elasticsearch.ports.external }}
         env:
         - name: node.name
           valueFrom:
@@ -35,7 +36,7 @@ spec:
                 fieldPath: metadata.name
 
         - name:  cluster.name
-          value: mi-cluster
+          value: {{ .Values.elasticsearch.clusterName }}
           
         - name:  discovery.seed_hosts
           value: elastic-maestro-0.elastic-maestro,elastic-maestro-1.elastic-maestro,elastic-maestro-2.elastic-maestro
@@ -62,10 +63,9 @@ spec:
         - name:  ELASTIC_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: elastic-secret
-                key:  password
-
-      
+                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" .Values.auth.passwordKey }}
+{{- if .Values.elasticsearch.master.persistence.enable }}                
         volumeMounts:      
         - name: datos-maestros
           mountPath: /usr/share/elasticsearch/data
@@ -78,6 +78,7 @@ spec:
           - "ReadWriteOnce"
         resources:
           requests:
-            storage: "1Gi"
-        storageClassName: cluster-nfs
+            storage: {{ .Values.elasticsearch.master.persistence.storage }}
+        storageClassName:  {{ .Values.elasticsearch.master.persistence.storageClass }}
+{{ end }}
         
