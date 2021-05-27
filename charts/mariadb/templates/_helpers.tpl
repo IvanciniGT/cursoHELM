@@ -1,7 +1,10 @@
 {{/* vim: set filetype=mustache: */}}
 
 {{- define "mariadb.primary.fullname" -}}
-{{- if eq .Values.architecture "replication" }}
+{{- if eq 
+
+
+Values.architecture "replication" }}
 {{- printf "%s-%s" (include "common.names.fullname" .) "primary" | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- include "common.names.fullname" . -}}

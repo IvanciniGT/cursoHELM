@@ -31,10 +31,10 @@ kibana:
   service: 
     nameOverride: ""
     fullnameOverride: ""
-    type: NodePort
+    type: ClusterIP
     port: 5601
     targetPort: 5601
-    nodePort: 30004
+    #nodePort: 30004
   
   # ingress:
 

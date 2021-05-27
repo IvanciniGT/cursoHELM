@@ -1,0 +1,177 @@
+---
+# Source: mies/templates/elasticsearch/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  labels:
+    app: elastic-maestro
+  name: elastic-maestro
+
+        
+
+spec:
+    type: ClusterIP
+    ports:
+        - name: externo
+          port: 9200
+          targetPort: 9200
+        - name: interno
+          port: 9300
+          targetPort: 9300
+    selector:
+        app: 
+            #elastic-data     SI Replicas de ingesta == 0
+            elastic-ingesta #  SI NO ES ASI
+---
+# Source: mies/templates/kibana/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  labels:
+    app: kibana
+  name: kibana-srv
+
+spec:
+    type: NodePort
+    ports:
+        - port: 5601
+          targetPort: 5601
+          nodePort: 30004
+    selector:
+        app: kibana
+---
+# Source: mies/templates/kibana/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  labels:
+    app: kibana
+  name: kibana
+
+spec:
+  replicas:    # kibana.replicaCount
+  selector:
+    matchLabels:
+      app: kibana
+      
+  template:
+    metadata:
+      labels:
+        app: kibana
+        
+    spec:
+      containers:
+      - image: # kibana.image.repository : kibana.image.tag
+        imagePullPolicy: # kibana.image.pullPolicy
+        name: kibana
+        ports:
+        - containerPort: # kibana.port
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elastic-coordinador:9200"
+        - name:  SERVER_NAME
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+        - name:  SERVER_HOST
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  ELASTICSEARCH_USERNAME
+          valueFrom:
+            secretKeyRef:
+                name: elastic-secret
+                key:  user
+                
+        - name:  ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: elastic-secret
+                key:  password
+---
+# Source: mies/templates/elasticsearch/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  labels:
+    app: elastic-maestro
+  name: elastic-maestro
+
+spec:
+  replicas: 3
+  
+  serviceName: elastic-maestro
+  
+  selector:
+    matchLabels:
+      app: elastic-maestro
+      
+  template:
+    metadata:
+      labels:
+        app: elastic-maestro
+        
+    spec:
+      containers:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+        name: elasticsearch
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  cluster.name
+          value: mi-cluster
+          
+        - name:  discovery.seed_hosts
+          value: elastic-maestro-0.elastic-maestro,elastic-maestro-1.elastic-maestro,elastic-maestro-2.elastic-maestro
+          
+        - name:  cluster.initial_master_nodes
+          value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
+
+        - name:  ES_JAVA_OPTS
+          value: "-Xms220m -Xmx220m"
+          
+        - name:  node.master
+          value: "true"
+        - name:  node.voting_only
+          value: "false"
+        - name:  node.data
+          value: "false"
+        - name:  node.ingest
+          value: "false"
+        - name:  node.remote_cluster_client
+          value: "false"
+
+        - name:  xpack.security.enabled
+          value: "true"
+        - name:  ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: elastic-secret
+                key:  password
+
+      
+        volumeMounts:      
+        - name: datos-maestros
+          mountPath: /usr/share/elasticsearch/data
+  
+  volumeClaimTemplates:
+    - metadata:
+        name: datos-maestros
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+        storageClassName: cluster-nfs

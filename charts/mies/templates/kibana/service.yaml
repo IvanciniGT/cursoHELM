@@ -7,10 +7,12 @@ metadata:
   name: kibana-srv
 
 spec:
-    type: NodePort
+    type: {{ .Values.kibana.service.type }}
     ports:
-        - port: 5601
-          targetPort: 5601
-          nodePort: 30004
+        - port: {{ .Values.kibana.service.port }}
+          targetPort: {{ .Values.kibana.service.targetPort }}
+          {{- if .Values.kibana.service.nodePort }}
+          nodePort: {{ .Values.kibana.service.nodePort }}
+          {{- end }}
     selector:
         app: kibana
