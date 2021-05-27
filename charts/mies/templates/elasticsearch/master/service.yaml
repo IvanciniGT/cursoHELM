@@ -17,5 +17,5 @@ spec:
           targetPort: {{ .Values.elasticsearch.ports.internal }}
     selector:
         app: 
-            elastic-master
+            elastic-maestro
  

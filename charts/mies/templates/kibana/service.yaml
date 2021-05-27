@@ -4,7 +4,13 @@ kind: Service
 metadata:
   labels:
     app: kibana
-  name: kibana-srv
+  name: {{ if not (empty .Values.kibana.service.fullnameOverride) -}}
+{{- .Values.kibana.service.fullnameOverride -}}
+{{- else if not (empty .Values.kibana.service.nameOverride) -}}
+{{- .Release.Name }}-{{ .Values.kibana.service.nameOverride -}}
+{{- else -}}
+{{- .Release.Name }}-kibana-srv
+{{- end }}
 
 spec:
     type: {{ .Values.kibana.service.type }}
@@ -16,3 +22,8 @@ spec:
           {{- end }}
     selector:
         app: kibana
+
+
+# NOMBRE DEL SERVICIO:
+
+

@@ -8,7 +8,7 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "RkNla0lrclg0TnNZSFBk"
+    password: "ZXhBS1ozR3d2UWx1WGox"
 ---
 # Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
@@ -30,7 +30,7 @@ spec:
           targetPort: 9300
     selector:
         app: 
-            elastic-master
+            elastic-maestro
 ---
 # Source: mies/templates/kibana/service.yaml
 apiVersion: v1
@@ -39,7 +39,7 @@ kind: Service
 metadata:
   labels:
     app: kibana
-  name: kibana-srv
+  name: RELEASE-NAME-kibana-srv
 
 spec:
     type: ClusterIP
@@ -48,6 +48,9 @@ spec:
           targetPort: 5601
     selector:
         app: kibana
+
+
+# NOMBRE DEL SERVICIO:
 ---
 # Source: mies/templates/kibana/deployment.yaml
 apiVersion: apps/v1
@@ -125,7 +128,7 @@ spec:
         
     spec:
       containers:
-      - image: docker.elastic.co/kibana/kibana:7.7.0
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
         imagePullPolicy: IfNotPresent
         name: elasticsearch
         ports:

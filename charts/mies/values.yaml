@@ -16,8 +16,8 @@ kibana:
     tag: 7.8.0
 
   service: 
-    nameOverride: ""
-    fullnameOverride: ""
+    nameOverride: ~
+    fullnameOverride: ~ 
     type: ClusterIP
     port: 5601
     targetPort: 5601
@@ -33,7 +33,7 @@ elasticsearch:
     ES_JAVA_OPTS: "-Xms220m -Xmx220m"
 
   image:
-    repository: docker.elastic.co/kibana/kibana
+    repository: docker.elastic.co/elasticsearch/elasticsearch
     pullPolicy: IfNotPresent
     tag: 7.7.0
   
