@@ -6,6 +6,8 @@ metadata:
     app: elastic-maestro
   name: elastic-maestro
 
+        
+
 spec:
     type: ClusterIP
     ports:
@@ -16,4 +18,13 @@ spec:
           port: 9300
           targetPort: 9300
     selector:
-        app: elastic-maestro
+        app: 
+            elastic-data     SI Replicas de ingesta == 0
+            elastic-ingesta  SI NO ES ASI 
+            
+helm install elastic-search-monitorizacion mies -n desarrollo -f values.yaml
+    Que servicio quiero crear?
+        Cómo quiero llamar al servicio que se cree para ingesta?
+            "mies-elastic-ingesta"
+            "mies-NAME_OVERRIDE"
+            "FULL_NAME_OVERRIDE"

@@ -50,6 +50,12 @@ elasticsearch:
     pullPolicy: IfNotPresent
     tag: 7.7.0
   
+  ports:
+    internal:
+      port: 9300
+    external:
+      port: 9200
+
   master:
   
     replicaCount: 3
@@ -57,18 +63,69 @@ elasticsearch:
     service: 
       nameOverride: ""
       fullnameOverride: ""
-      ports:
-        internal:
-          port: 9300
-          targetPort: 9300
-        external:
-          port: 9200
-          targetPort: 9200
-    
+      
     nodeProperties:
       ES_JAVA_OPTS: "-Xms220m -Xmx220m"
     
+    persistence:
+      enable: true
+      storage: 1Gi
+      storageClass: ~
+
+  data:
+  
+    replicaCount: 2
+  
+    nodeProperties:
+      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
     
+    persistence:
+      enable: true
+      storage: 1Gi
+      storageClass: ~
+      
+  ingest:
+  
+    replicaCount: 0
+  
+    nodeProperties:
+      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+    
+    persistence:
+      enable: true
+      storage: 1Gi
+      storageClass: ~
+
+  coordinator:
+  
+    replicaCount: 0
+  
+    nodeProperties:
+      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+    
+    persistence:
+      enable: true
+      storage: 1Gi
+      storageClass: ~
+      
+  services:
+  
+    ingest:
+      nameOverride: ""
+      fullnameOverride: ""
+      type: ClusterIP
+      port: 9200
+      #nodePort: 30006
+  
+    query:
+      nameOverride: ""
+      fullnameOverride: ""
+      type: ClusterIP
+      port: 9200
+      #nodePort: 30007
+    
+
+#########################################################    
 
 # Default values for mies.
 # This is a YAML-formatted file.
