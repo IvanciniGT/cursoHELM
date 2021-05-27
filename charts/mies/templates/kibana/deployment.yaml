@@ -40,12 +40,12 @@ spec:
         - name:  ELASTICSEARCH_USERNAME
           valueFrom:
             secretKeyRef:
-                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                name: {{ .Values.auth.existentSecretName | default ( include "mies.secret" . ) }} 
                 key:  {{ required "Debe introducir un valor para el nombre de la clave del USUARIO en el SECRET: auth.userNameKey !!!" .Values.auth.userNameKey }}
                 
         - name:  ELASTICSEARCH_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                name: {{ .Values.auth.existentSecretName | default (include "mies.secret" .  ) }} 
                 key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" .Values.auth.passwordKey }}
                 

@@ -8,7 +8,7 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "UnhjWnJDSjd1R1VYR05X"
+    password: "U3duOE8xa3RvR1RHZnN4"
 ---
 # Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
@@ -94,13 +94,13 @@ spec:
         - name:  ELASTICSEARCH_USERNAME
           valueFrom:
             secretKeyRef:
-                name: secreto-elastic 
+                name: RELEASE-NAME-secret 
                 key:  user
                 
         - name:  ELASTICSEARCH_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: secreto-elastic 
+                name: RELEASE-NAME-secret 
                 key:  password
 ---
 # Source: mies/templates/elasticsearch/master/statefulset.yaml

@@ -63,7 +63,7 @@ spec:
         - name:  ELASTIC_PASSWORD
           valueFrom:
             secretKeyRef:
-                name: {{ .Values.auth.existentSecretName | default ("secreto-elastic") }} 
+                name: {{ .Values.auth.existentSecretName | default ( include "mies.secret" . ) }} 
                 key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" .Values.auth.passwordKey }}
 {{- if .Values.elasticsearch.master.persistence.enable }}                
         volumeMounts:      
