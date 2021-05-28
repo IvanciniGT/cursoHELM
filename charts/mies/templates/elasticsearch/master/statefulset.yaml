@@ -30,7 +30,7 @@ spec:
         - containerPort: {{ .Values.elasticsearch.ports.internal }}
         - containerPort: {{ .Values.elasticsearch.ports.external }}
         
-        {{- if  .Values.elasticsearch.master.nodeProperties }}
+        {{- if or  .Values.elasticsearch.nodeProperties .Values.elasticsearch.master.nodeProperties }}
         envFrom:
             - configMapRef:
                 name: {{ include "mies.elasticsearchmaestroservicename" . }}-configmap

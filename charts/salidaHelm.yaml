@@ -8,7 +8,7 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "NnV1RDBkZFpVZmNxc256"
+    password: "OWtmaWRQamg1V09zZ1lD"
 ---
 # Source: mies/templates/elasticsearch/master/configmap.yaml
 kind: ConfigMap
@@ -19,11 +19,11 @@ metadata:
 
 data:
     ES_JAVA_OPTS: "-Xms220m -Xmx220m"
-    VARIABLE2: "valor2"
 ---
 # Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
 kind: Service
+
 
 metadata:
   labels: 

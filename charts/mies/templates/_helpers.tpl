@@ -1,10 +1,12 @@
 {{- define "mies.kibanaservicename" -}}
-{{- if not (empty .Values.kibana.service.fullnameOverride) -}}
-{{- .Values.kibana.service.fullnameOverride -}}
-{{- else if not (empty .Values.kibana.service.nameOverride) -}}
-{{- .Release.Name }}-{{ .Values.kibana.service.nameOverride -}}
+{{- with .Values.kibana.service }}
+{{- if not (empty .fullnameOverride) -}}
+{{- .fullnameOverride -}}
+{{- else if not (empty .nameOverride) -}}
+{{- $.Release.Name }}-{{ .nameOverride -}}
 {{- else -}}
-{{- .Release.Name }}-kibana-srv
+{{- $.Release.Name }}-kibana-srv
+{{- end -}}
 {{- end -}}
 {{- end -}}
 

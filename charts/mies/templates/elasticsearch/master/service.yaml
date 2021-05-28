@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: Service
 
+
 metadata:
   labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4 -}}
     app:  {{ include "mies.elasticsearchmaestrolabel" . }}

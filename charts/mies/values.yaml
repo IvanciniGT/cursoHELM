@@ -34,7 +34,7 @@ elasticsearch:
   clusterName: mi-cluster
 
   nodeProperties:
-    ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+    ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
 
   image:
     repository: docker.elastic.co/elasticsearch/elasticsearch
@@ -54,7 +54,7 @@ elasticsearch:
       fullnameOverride: ~
       
     nodeProperties:
-      #ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
       #VARIABLE2: valor2
     
     persistence:
