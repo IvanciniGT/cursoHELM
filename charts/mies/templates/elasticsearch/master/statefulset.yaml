@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 
 metadata:
-  labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4}}
+  labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4 -}}
     app: {{ include "mies.elasticsearchmaestrolabel" . }}
   name: {{ include "mies.elasticsearchmaestrostatefulset" . }}
 
@@ -18,7 +18,7 @@ spec:
       
   template:
     metadata:
-      labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 8}}
+      labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 8 -}}
         app:  {{ include "mies.elasticsearchmaestrolabel" . }}
         
     spec:
@@ -29,6 +29,12 @@ spec:
         ports:
         - containerPort: {{ .Values.elasticsearch.ports.internal }}
         - containerPort: {{ .Values.elasticsearch.ports.external }}
+        
+        {{- if  .Values.elasticsearch.master.nodeProperties }}
+        envFrom:
+            - configMapRef:
+                name: {{ include "mies.elasticsearchmaestroservicename" . }}-configmap
+        {{- end }}        
         env:
         - name: node.name
           valueFrom:
@@ -43,9 +49,6 @@ spec:
           
         - name:  cluster.initial_master_nodes
           value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
-
-        - name:  ES_JAVA_OPTS
-          value: "-Xms220m -Xmx220m"
           
         - name:  node.master
           value: "true"

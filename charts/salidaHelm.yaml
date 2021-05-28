@@ -8,7 +8,18 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "eExiTURpUldmOFhVb2N6"
+    password: "NnV1RDBkZFpVZmNxc256"
+---
+# Source: mies/templates/elasticsearch/master/configmap.yaml
+kind: ConfigMap
+apiVersion: v1
+
+metadata:
+    name:  RELEASE-NAME-elasticsearch-maestro-srv-configmap
+
+data:
+    ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+    VARIABLE2: "valor2"
 ---
 # Source: mies/templates/elasticsearch/master/service.yaml
 apiVersion: v1
@@ -16,7 +27,6 @@ kind: Service
 
 metadata:
   labels: 
-    
     app:  RELEASE-NAME-elasticsearch-maestro
   name: RELEASE-NAME-elasticsearch-maestro-srv
 
@@ -39,7 +49,6 @@ kind: Service
 
 metadata:
   labels: 
-    
     mode: "Ivan"
     mode2: "Ivancito"
     app: RELEASE-NAME-kibana
@@ -62,7 +71,6 @@ kind: Deployment
 
 metadata:
   labels: 
-    
     mode: "Ivan"
     mode2: "Ivancito"
     app:  RELEASE-NAME-kibana
@@ -77,7 +85,6 @@ spec:
   template:
     metadata:
       labels: 
-        
         mode: "Ivan"
         mode2: "Ivancito"
         app:  RELEASE-NAME-kibana
@@ -119,7 +126,6 @@ kind: StatefulSet
 
 metadata:
   labels: 
-    
     app: RELEASE-NAME-elasticsearch-maestro
   name: RELEASE-NAME-elasticsearch-maestro
 
@@ -135,7 +141,6 @@ spec:
   template:
     metadata:
       labels: 
-        
         app:  RELEASE-NAME-elasticsearch-maestro
         
     spec:
@@ -146,6 +151,9 @@ spec:
         ports:
         - containerPort: 9300
         - containerPort: 9200
+        envFrom:
+            - configMapRef:
+                name: RELEASE-NAME-elasticsearch-maestro-srv-configmap        
         env:
         - name: node.name
           valueFrom:
@@ -160,9 +168,6 @@ spec:
           
         - name:  cluster.initial_master_nodes
           value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
-
-        - name:  ES_JAVA_OPTS
-          value: "-Xms220m -Xmx220m"
           
         - name:  node.master
           value: "true"

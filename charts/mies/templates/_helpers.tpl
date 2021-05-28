@@ -40,9 +40,9 @@
 {{- end -}}
 
 {{- define "mies.extralabels" -}}
-{{- range $clave, $valor := . }}
-{{ $clave }}: {{ $valor | quote }}
-{{- end -}}
+{{- range $clave, $valor := . -}}
+{{- $clave }}: {{ $valor | quote }}
+{{ end -}}
 {{- end -}}
 
 

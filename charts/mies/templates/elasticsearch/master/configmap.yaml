@@ -1,0 +1,14 @@
+{{ if  .Values.elasticsearch.master.nodeProperties }}
+
+kind: ConfigMap
+apiVersion: v1
+
+metadata:
+    name:  {{ include "mies.elasticsearchmaestroservicename" . }}-configmap
+
+data:
+{{- range $clave, $valor := .Values.elasticsearch.master.nodeProperties }}
+    {{ $clave }}: {{ $valor | quote }}    
+{{- end -}}
+
+{{ end }}

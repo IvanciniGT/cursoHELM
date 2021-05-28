@@ -54,7 +54,8 @@ elasticsearch:
       fullnameOverride: ~
       
     nodeProperties:
-      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+      #ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+      #VARIABLE2: valor2
     
     persistence:
       enable: true
