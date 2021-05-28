@@ -1,87 +1,11 @@
+{{ range $tipo_nodo, $especificacion := dict "master" .Values.elasticsearch.master "ingest" .Values.elasticsearch.ingest "coordinator" .Values.elasticsearch.coordinator "data" .Values.elasticsearch.data }}
 
+---
 apiVersion: apps/v1
 kind: StatefulSet
 
 metadata:
-  labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4 -}}
-    app: {{ include "mies.elasticsearchmaestrolabel" . }}
-  name: {{ include "mies.elasticsearchmaestrostatefulset" . }}
+  labels: {{ include "mies.extralabels" $especificacion.extraLabels | nindent 4 -}}
+    app: {{ include "mies.elasticsearchlabel" $ }}{{ $tipo_nodo }}
 
-spec:
-  replicas: {{ required "Debe introducir un número de replicas válido para los maestros de ElasticSearch: elasticsearch.master.replicaCount" .Values.elasticsearch.master.replicaCount }}
-  
-  serviceName: {{ include "mies.elasticsearchmaestroservicename" . }}
-  
-  selector:
-    matchLabels:
-      app:  {{ include "mies.elasticsearchmaestrolabel" . }}
-      
-  template:
-    metadata:
-      labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 8 -}}
-        app:  {{ include "mies.elasticsearchmaestrolabel" . }}
-        
-    spec:
-      containers:
-      - image: {{ .Values.elasticsearch.image.repository }}:{{ .Values.elasticsearch.image.tag }}
-        imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy }}
-        name: elasticsearch
-        ports:
-        - containerPort: {{ .Values.elasticsearch.ports.internal }}
-        - containerPort: {{ .Values.elasticsearch.ports.external }}
-        
-        {{- if or  .Values.elasticsearch.nodeProperties .Values.elasticsearch.master.nodeProperties }}
-        envFrom:
-            - configMapRef:
-                name: {{ include "mies.elasticsearchmaestroservicename" . }}-configmap
-        {{- end }}        
-        env:
-        - name: node.name
-          valueFrom:
-            fieldRef:
-                fieldPath: metadata.name
-
-        - name:  cluster.name
-          value: {{ .Values.elasticsearch.clusterName }}
-          
-        - name:  discovery.seed_hosts
-          value: elastic-maestro-0.{{ include "mies.elasticsearchmaestroservicename" . }},elastic-maestro-1.{{ include "mies.elasticsearchmaestroservicename" . }},elastic-maestro-2.{{ include "mies.elasticsearchmaestroservicename" . }}
-          
-        - name:  cluster.initial_master_nodes
-          value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
-          
-        - name:  node.master
-          value: "true"
-        - name:  node.voting_only
-          value: "false"
-        - name:  node.data
-          value: "false"
-        - name:  node.ingest
-          value: "false"
-        - name:  node.remote_cluster_client
-          value: "false"
-
-        - name:  xpack.security.enabled
-          value: "true"
-        - name:  ELASTIC_PASSWORD
-          valueFrom:
-            secretKeyRef:
-                name: {{ .Values.auth.existentSecretName | default ( include "mies.secret" . ) }} 
-                key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" .Values.auth.passwordKey }}
-{{- if .Values.elasticsearch.master.persistence.enable }}                
-        volumeMounts:      
-        - name: datos-maestros
-          mountPath: /usr/share/elasticsearch/data
-  
-  volumeClaimTemplates:
-    - metadata:
-        name: datos-maestros
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: {{ .Values.elasticsearch.master.persistence.storage }}
-        storageClassName:  {{ .Values.elasticsearch.master.persistence.storageClass }}
 {{ end }}
-        

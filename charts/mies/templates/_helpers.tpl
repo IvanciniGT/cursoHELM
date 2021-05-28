@@ -37,8 +37,8 @@
 {{- .Release.Name }}-kibana
 {{- end -}}
 
-{{- define "mies.elasticsearchmaestrolabel" -}}
-{{- .Release.Name }}-elasticsearch-maestro
+{{- define "mies.elasticsearchlabel" -}}
+{{- .Release.Name }}-elasticsearch-
 {{- end -}}
 
 {{- define "mies.extralabels" -}}

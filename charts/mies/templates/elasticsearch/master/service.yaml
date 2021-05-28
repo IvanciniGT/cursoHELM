@@ -4,7 +4,7 @@ kind: Service
 
 metadata:
   labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4 -}}
-    app:  {{ include "mies.elasticsearchmaestrolabel" . }}
+
   name: {{ include "mies.elasticsearchmaestroservicename" . }}
 
 spec:
@@ -18,5 +18,3 @@ spec:
           targetPort: {{ .Values.elasticsearch.ports.internal }}
     selector:
         app: 
-             {{ include "mies.elasticsearchmaestrolabel" . }}
- 

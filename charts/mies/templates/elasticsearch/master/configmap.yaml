@@ -10,7 +10,7 @@ data:
 {{- range $clave, $valor := .Values.elasticsearch.nodeProperties }}
     {{- if not ( hasKey $.Values.elasticsearch.master.nodeProperties $clave ) }}   
     {{ $clave }}: {{ $valor | quote }}    
-{{- end -}}
+    {{- end -}}
 {{- end -}}
 {{- range $clave, $valor := .Values.elasticsearch.master.nodeProperties }}
     {{ $clave }}: {{ $valor | quote }}    
