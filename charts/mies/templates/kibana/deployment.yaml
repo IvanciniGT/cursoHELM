@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  labels:
+  labels: {{ include "mies.extralabels" .Values.kibana.extraLabels | nindent 4}}
     app:  {{ include "mies.kibanalabel" . }}
   name:  {{ include "mies.kibanadeployment" . }}
 
@@ -15,9 +15,9 @@ spec:
       
   template:
     metadata:
-      labels:
+      labels: {{ include "mies.extralabels" .Values.kibana.extraLabels | nindent 8 }}
         app:  {{ include "mies.kibanalabel" . }}
-        
+
     spec:
       containers:
       - image: {{ .Values.kibana.image.repository }}:{{ .Values.kibana.image.tag }}

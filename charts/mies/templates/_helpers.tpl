@@ -39,7 +39,11 @@
 {{- .Release.Name }}-elasticsearch-maestro
 {{- end -}}
 
-
+{{- define "mies.extralabels" -}}
+{{- range $clave, $valor := . }}
+{{ $clave }}: {{ $valor | quote }}
+{{- end -}}
+{{- end -}}
 
 
 
