@@ -76,3 +76,13 @@ Nodo 4   >>>  Maestros (Balanceador - Service) >>> Maestro 1 o Maestro 2:9300 o 
 
 Cuando Data 3 conozca al maetsro 1, que pasa?
     Le pilla su IP y... lo presenta al resto de hermanitos . En que puerto? 9300
+    
+    
+----
+           
+helm install elastic-search-monitorizacion mies -n desarrollo -f values.yaml
+    Que servicio quiero crear?
+        Cómo quiero llamar al servicio que se cree para ingesta?
+            "mies-elastic-ingesta"
+            "mies-NAME_OVERRIDE"
+            "FULL_NAME_OVERRIDE"

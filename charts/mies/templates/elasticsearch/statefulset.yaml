@@ -23,7 +23,7 @@ spec:
   serviceName: {{ $servicio_maestro }}
 
   {{- else }}
-  serviceName: {{ randAlphaNum 10 }}
+  serviceName: {{ randAlphaNum 10 | lower }}
   {{- end }}
   selector:
     matchLabels:

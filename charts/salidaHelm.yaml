@@ -8,7 +8,7 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "MVJNUVZ2SG95dkx5aldW"
+    password: "d01hUXdHRWp5YW1IYzI4"
 ---
 # Source: mies/templates/elasticsearch/configmap.yaml
 kind: ConfigMap
@@ -192,7 +192,7 @@ metadata:
 
 spec:
   replicas: 2
-  serviceName: ZmquXEDvtE
+  serviceName: qklcqihkcj
   selector:
     matchLabels:
       app:  RELEASE-NAME-elasticsearch-data
