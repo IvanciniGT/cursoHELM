@@ -1,12 +1,19 @@
+
 apiVersion: v1
 kind: Service
 
 
 metadata:
   labels: {{ include "mies.extralabels" .Values.elasticsearch.master.extraLabels | nindent 4 -}}
+    app: {{ include "mies.elasticsearchlabel" $ }}master
 
-  name: {{ include "mies.elasticsearchmaestroservicename" . }}
 
+{{- $release := dict "ReleaseName" $.Release.Name "ServiceName" "master" }}
+{{- $contexto := merge $.Values.elasticsearch.master $release }}
+{{- $servicio_maestro := include "mies.elasticsearchservicename" $contexto }}
+  
+  name: {{ $servicio_maestro }}
+  
 spec:
     type: ClusterIP
     ports:
@@ -17,4 +24,4 @@ spec:
           port: {{ required "Debe introducir un valor para el puerto interno de comunicaciones de ElastiSearch: elasticsearch.ports.internal !!!" .Values.elasticsearch.ports.internal }}
           targetPort: {{ .Values.elasticsearch.ports.internal }}
     selector:
-        app: 
+        app: {{ include "mies.elasticsearchlabel" $ }}master

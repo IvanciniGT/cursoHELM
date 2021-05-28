@@ -1,0 +1,27 @@
+{{ range $tipo_nodo, $especificacion := dict "master" .Values.elasticsearch.master "ingest" .Values.elasticsearch.ingest "coordinator" .Values.elasticsearch.coordinator "data" .Values.elasticsearch.data }}
+
+{{ if gt ($especificacion.replicaCount | int ) 0}}
+
+
+{{ if or $especificacion.nodeProperties $.Values.elasticsearch.nodeProperties }}
+---
+kind: ConfigMap
+apiVersion: v1
+
+metadata:
+    name:  {{ include "mies.elasticsearchstatefulset" $ }}{{ $tipo_nodo }}-configmap
+
+data:
+{{- range $clave, $valor := $.Values.elasticsearch.nodeProperties }}
+    {{- if not ( hasKey $especificacion.nodeProperties $clave ) }}   
+    {{ $clave }}: {{ $valor | quote }}    
+    {{- end -}}
+{{- end -}}
+{{- range $clave, $valor := $especificacion.nodeProperties }}
+    {{ $clave }}: {{ $valor | quote }}    
+{{- end -}}
+
+{{ end }}
+
+{{ end }}
+{{ end }}

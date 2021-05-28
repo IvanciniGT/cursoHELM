@@ -11,13 +11,13 @@
 {{- end -}}
 
 
-{{- define "mies.elasticsearchmaestroservicename" -}}
-{{- if not (empty .Values.elasticsearch.master.service.fullnameOverride) -}}
-{{- .Values.elasticsearch.master.service.fullnameOverride -}}
-{{- else if not (empty .Values.elasticsearch.master.service.nameOverride) -}}
-{{- .Release.Name }}-{{ .Values.elasticsearch.master.service.nameOverride -}}
+{{- define "mies.elasticsearchservicename" -}}
+{{- if not (empty .fullnameOverride) -}}
+{{- .fullnameOverride -}}
+{{- else if not (empty .nameOverride) -}}
+{{- .ReleaseName }}-{{ .nameOverride -}}
 {{- else -}}
-{{- .Release.Name }}-elasticsearch-maestro-srv
+{{- .ReleaseName }}-elasticsearch-{{ .ServiceName }}-srv
 {{- end -}}
 {{- end -}}
 
@@ -25,8 +25,8 @@
 {{- .Release.Name }}-kibana
 {{- end -}}
 
-{{- define "mies.elasticsearchmaestrostatefulset" -}}
-{{- .Release.Name }}-elasticsearch-maestro
+{{- define "mies.elasticsearchstatefulset" -}}
+{{- .Release.Name }}-elasticsearch-
 {{- end -}}
 
 {{- define "mies.secret" -}}

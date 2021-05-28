@@ -8,14 +8,25 @@ metadata:
 
 data:
     user: "ZWxhc3RpYw=="
-    password: "U0szbXF4cGZZNmIwQURY"
+    password: "MVJNUVZ2SG95dkx5aldW"
 ---
-# Source: mies/templates/elasticsearch/master/configmap.yaml
+# Source: mies/templates/elasticsearch/configmap.yaml
 kind: ConfigMap
 apiVersion: v1
 
 metadata:
-    name:  RELEASE-NAME-elasticsearch-maestro-srv-configmap
+    name:  RELEASE-NAME-elasticsearch-data-configmap
+
+data:   
+    otra_propiedad: "con su valor"
+    ES_JAVA_OPTS: "-Xms500m -Xmx500m"
+---
+# Source: mies/templates/elasticsearch/configmap.yaml
+kind: ConfigMap
+apiVersion: v1
+
+metadata:
+    name:  RELEASE-NAME-elasticsearch-master-configmap
 
 data:   
     otra_propiedad: "con su valor"
@@ -29,8 +40,10 @@ kind: Service
 metadata:
   labels: 
     label1: "value1"
-    name: RELEASE-NAME-elasticsearch-maestro-srv
-
+    app: RELEASE-NAME-elasticsearch-master
+  
+  name: RELEASE-NAME-elasticsearch-master-srv
+  
 spec:
     type: ClusterIP
     ports:
@@ -41,7 +54,55 @@ spec:
           port: 9300
           targetPort: 9300
     selector:
-        app:
+        app: RELEASE-NAME-elasticsearch-master
+---
+# Source: mies/templates/elasticsearch/service.yaml
+kind: Service
+apiVersion: v1
+
+metadata:
+  labels: 
+    app: RELEASE-NAME-elasticsearch-ingest
+  
+  name: RELEASE-NAME-elasticsearch-ingest-srv
+  
+spec:
+    type: ClusterIP
+    ports:
+        - name: externo
+          port: 9200
+          targetPort: 9200
+    selector:
+        app: RELEASE-NAME-elasticsearch-data   
+        #### 
+        ### Servicio de ingesta: app:  Statefulset de Ingesta o en su lugar 
+        # RELEASE-NAME-elasticsearch-data
+        # RELEASE-NAME-elasticsearch-ingest
+        ###
+---
+# Source: mies/templates/elasticsearch/service.yaml
+kind: Service
+apiVersion: v1
+
+metadata:
+  labels: 
+    app: RELEASE-NAME-elasticsearch-query
+  
+  name: RELEASE-NAME-elasticsearch-query-srv
+  
+spec:
+    type: ClusterIP
+    ports:
+        - name: externo
+          port: 9200
+          targetPort: 9200
+    selector:
+        app: RELEASE-NAME-elasticsearch-data   
+        #### 
+        ### Servicio de ingesta: app:  Statefulset de Ingesta o en su lugar 
+        # RELEASE-NAME-elasticsearch-data
+        # RELEASE-NAME-elasticsearch-ingest
+        ###
 ---
 # Source: mies/templates/kibana/service.yaml
 apiVersion: v1
@@ -120,32 +181,71 @@ spec:
                 name: RELEASE-NAME-secret 
                 key:  password
 ---
-# Source: mies/templates/elasticsearch/master/statefulset.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-
-metadata:
-  labels: 
-    app: RELEASE-NAME-elasticsearch-coordinator
----
-# Source: mies/templates/elasticsearch/master/statefulset.yaml
+# Source: mies/templates/elasticsearch/statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 
 metadata:
   labels: 
     app: RELEASE-NAME-elasticsearch-data
----
-# Source: mies/templates/elasticsearch/master/statefulset.yaml
-apiVersion: apps/v1
-kind: StatefulSet
+  name: RELEASE-NAME-elasticsearch-data
 
-metadata:
-  labels: 
-    label2: "value2"
-    app: RELEASE-NAME-elasticsearch-ingest
+spec:
+  replicas: 2
+  serviceName: ZmquXEDvtE
+  selector:
+    matchLabels:
+      app:  RELEASE-NAME-elasticsearch-data
+      
+      
+
+  template:
+    metadata:
+      labels: 
+        app:  RELEASE-NAME-elasticsearch-data
+        
+    spec:
+      containers:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+        imagePullPolicy: IfNotPresent
+        name: elasticsearch
+        ports:
+        - containerPort: 9300
+        - containerPort: 9200
+        envFrom:
+            - configMapRef:
+                name: RELEASE-NAME-elasticsearch-data-configmap        
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  cluster.name
+          value: mi-cluster
+        - name:  discovery.seed_hosts
+          value: elastic-maestro-0.RELEASE-NAME-elasticsearch-master-srv,elastic-maestro-1.RELEASE-NAME-elasticsearch-master-srv,elastic-maestro-2.RELEASE-NAME-elasticsearch-master-srv
+          
+        - name:  node.master
+          value:  "false" 
+        - name:  node.voting_only
+          value: "false"
+        - name:  node.data
+          value: "true"
+        - name:  node.ingest
+          value:  "false" 
+        - name:  node.remote_cluster_client
+          value: "false"
+
+        - name:  xpack.security.enabled
+          value: "true"
+        - name:  ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: RELEASE-NAME-secret 
+                key:  password
 ---
-# Source: mies/templates/elasticsearch/master/statefulset.yaml
+# Source: mies/templates/elasticsearch/statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 
@@ -153,3 +253,63 @@ metadata:
   labels: 
     label1: "value1"
     app: RELEASE-NAME-elasticsearch-master
+  name: RELEASE-NAME-elasticsearch-master
+
+spec:
+  replicas: 3
+    
+  serviceName: RELEASE-NAME-elasticsearch-master-srv
+  selector:
+    matchLabels:
+      app:  RELEASE-NAME-elasticsearch-master
+      
+      
+
+  template:
+    metadata:
+      labels: 
+        label1: "value1"
+        app:  RELEASE-NAME-elasticsearch-master
+        
+    spec:
+      containers:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+        imagePullPolicy: IfNotPresent
+        name: elasticsearch
+        ports:
+        - containerPort: 9300
+        - containerPort: 9200
+        envFrom:
+            - configMapRef:
+                name: RELEASE-NAME-elasticsearch-master-configmap        
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  cluster.name
+          value: mi-cluster
+        - name:  cluster.initial_master_nodes
+          value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
+        - name:  discovery.seed_hosts
+          value: elastic-maestro-0.RELEASE-NAME-elasticsearch-master-srv,elastic-maestro-1.RELEASE-NAME-elasticsearch-master-srv,elastic-maestro-2.RELEASE-NAME-elasticsearch-master-srv
+          
+        - name:  node.master
+          value: "true"
+        - name:  node.voting_only
+          value: "false"
+        - name:  node.data
+          value:  "false" 
+        - name:  node.ingest
+          value:  "false" 
+        - name:  node.remote_cluster_client
+          value: "false"
+
+        - name:  xpack.security.enabled
+          value: "true"
+        - name:  ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: RELEASE-NAME-secret 
+                key:  password

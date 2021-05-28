@@ -71,7 +71,7 @@ elasticsearch:
     replicaCount: 2
   
     nodeProperties:
-      ES_JAVA_OPTS: "-Xms220m -Xmx220m"
+      ES_JAVA_OPTS: "-Xms500m -Xmx500m"
     
     persistence:
       enable: true

@@ -1,0 +1,32 @@
+{{ range $tipo_nodo, $especificacion := dict "ingest" .Values.elasticsearch.services.ingest "query" .Values.elasticsearch.services.query }}
+
+---
+kind: Service
+apiVersion: v1
+
+metadata:
+  labels: {{ include "mies.extralabels" $especificacion.extraLabels | nindent 4 -}}
+    app: {{ include "mies.elasticsearchlabel" $ }}{{$tipo_nodo}}
+
+
+{{- $release := dict "ReleaseName" $.Release.Name "ServiceName" $tipo_nodo }}
+{{- $contexto := merge $especificacion $release }}
+{{- $nombre_servicio := include "mies.elasticsearchservicename" $contexto }}
+  
+  name: {{ $nombre_servicio }}
+  
+spec:
+    type: {{ $especificacion.type }}
+    ports:
+        - name: externo
+          port: {{ required "Debe introducir un valor para el puerto externo de comunicaciones de ElastiSearch: elasticsearch.ports.external !!!" $especificacion.port }}
+          targetPort: {{ $.Values.elasticsearch.ports.external }}
+    selector:
+        app: {{ include "mies.elasticsearchlabel" $ }}data   
+        #### 
+        ### Servicio de ingesta: app:  Statefulset de Ingesta o en su lugar 
+        # RELEASE-NAME-elasticsearch-data
+        # RELEASE-NAME-elasticsearch-ingest
+        ###
+        
+{{ end }} 

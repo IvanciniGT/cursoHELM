@@ -1,0 +1,91 @@
+{{ range $tipo_nodo, $especificacion := dict "master" .Values.elasticsearch.master "ingest" .Values.elasticsearch.ingest "coordinator" .Values.elasticsearch.coordinator "data" .Values.elasticsearch.data }}
+
+{{ if gt ($especificacion.replicaCount | int ) 0}}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  labels: {{ include "mies.extralabels" $especificacion.extraLabels | nindent 4 -}}
+    app: {{ include "mies.elasticsearchlabel" $ }}{{ $tipo_nodo }}
+  name: {{ include "mies.elasticsearchstatefulset" $ }}{{ $tipo_nodo }}
+
+spec:
+  replicas: {{ required "Debe introducir un número de replicas válido para los maestros de ElasticSearch: elasticsearch.master.replicaCount" $especificacion.replicaCount }}
+
+{{- $release := dict "ReleaseName" $.Release.Name "ServiceName" "master" }}
+{{- $contexto := merge $.Values.elasticsearch.master.service $release }}
+{{- $servicio_maestro := include "mies.elasticsearchservicename" $contexto }}
+
+  {{- if $especificacion.service }}
+    
+  serviceName: {{ $servicio_maestro }}
+
+  {{- else }}
+  serviceName: {{ randAlphaNum 10 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app:  {{ include "mies.elasticsearchlabel" $ }}{{ $tipo_nodo }}
+      
+      
+
+  template:
+    metadata:
+      labels: {{ include "mies.extralabels" $especificacion.extraLabels | nindent 8 -}}
+        app:  {{ include "mies.elasticsearchlabel" $ }}{{ $tipo_nodo }}
+        
+    spec:
+      containers:
+      - image: {{ $.Values.elasticsearch.image.repository }}:{{ $.Values.elasticsearch.image.tag }}
+        imagePullPolicy: {{ $.Values.elasticsearch.image.pullPolicy }}
+        name: elasticsearch
+        ports:
+        - containerPort: {{ $.Values.elasticsearch.ports.internal }}
+        - containerPort: {{ $.Values.elasticsearch.ports.external }}
+        
+        {{- if or  $.Values.elasticsearch.nodeProperties $especificacion.nodeProperties }}
+        envFrom:
+            - configMapRef:
+                name: {{ include "mies.elasticsearchstatefulset" $ }}{{ $tipo_nodo }}-configmap
+        {{- end }}        
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+                fieldPath: metadata.name
+
+        - name:  cluster.name
+          value: {{ $.Values.elasticsearch.clusterName }}
+          
+          {{- if eq $tipo_nodo "master" }}
+        - name:  cluster.initial_master_nodes
+          value: elastic-maestro-0,elastic-maestro-1,elastic-maestro-2
+          {{- end }}
+        - name:  discovery.seed_hosts
+          value: elastic-maestro-0.{{ $servicio_maestro }},elastic-maestro-1.{{ $servicio_maestro }},elastic-maestro-2.{{ $servicio_maestro }}
+          
+        - name:  node.master
+          value: {{ if eq $tipo_nodo "master" }}"true"{{ else }} "false" {{ end }}
+        - name:  node.voting_only
+          value: "false"
+        - name:  node.data
+          value: {{ if eq $tipo_nodo "data" }}"true"{{ else }} "false" {{ end }}
+        - name:  node.ingest
+          value: {{ if eq $tipo_nodo "ingest" }}"true"{{ else }} "false" {{ end }}
+        - name:  node.remote_cluster_client
+          value: "false"
+
+        - name:  xpack.security.enabled
+          value: "true"
+        - name:  ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: {{ $.Values.auth.existentSecretName | default ( include "mies.secret" $ ) }} 
+                key:  {{ required "Debe introducir un valor para el nombre de la clave del PASSWORD en el SECRET: auth.passwordKey !!!" $.Values.auth.passwordKey }}
+      
+      
+      
+{{ end }}
+{{ end }}
